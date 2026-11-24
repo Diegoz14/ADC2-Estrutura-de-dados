@@ -62,8 +62,8 @@ section{padding:64px 0;border-top:1px solid var(--line)}
 .sec-n{font-family:"Bricolage";font-weight:700;color:var(--brand);font-size:.9rem;letter-spacing:.08em}
 .intro{color:var(--muted);max-width:70ch;font-size:1.05rem}
 .grid{display:grid;gap:16px}
-.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
-.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr))}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px}
 .card h3{margin-top:0}
 .card ul{padding-left:1.1em;margin:.4em 0}
@@ -87,7 +87,7 @@ section{padding:64px 0;border-top:1px solid var(--line)}
 .where{font-size:.85rem;color:var(--muted)}
 .why{border-left:3px solid var(--brand);padding:4px 0 4px 14px;margin:14px 0;color:var(--text)}
 .why b{color:var(--brand)}
-.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:18px}
 
 /* tabela */
 .tbl{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
