@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VINDIX · Estruturas de Dados no Projeto Integrador</title>
+<meta name="description" content="Documento técnico do PI VINDIX: como filas, listas, tabelas hash, ordenação, busca e árvores sustentam a arquitetura do sistema.">
+<link rel="icon" href="assets/logo.png">
+<style>
+@font-face{font-family:"Bricolage";src:url(assets/bricolage-grotesque.woff2) format("woff2");font-weight:200 800;font-display:swap}
+@font-face{font-family:"Figtree";src:url(assets/figtree.woff2) format("woff2");font-weight:300 900;font-display:swap}
+:root{
+  --bg:#f6f4fa;--surface:#fff;--surface-2:#efeaf6;--line:#ddd5ea;
+  --text:#1c1630;--muted:#5d5574;--brand:#5b2a86;--brand-2:#7c45b0;--brand-soft:#efe6f8;
+  --ok:#1f7a4d;--warn:#9a5b00;--code:#1a1630;--code-text:#e9e2f7;
+  --radius:14px;--max:1080px;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#110e1c;--surface:#1a1630;--surface-2:#221d3b;--line:#332c52;
+  --text:#ece8f6;--muted:#a79fc0;--brand:#b48ae8;--brand-2:#c9a6f2;--brand-soft:#2a2247;
+  --ok:#5fd39a;--warn:#f0b45a;--code:#0c0a15;
+}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 "Figtree",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:"Bricolage","Figtree",sans-serif;line-height:1.15;letter-spacing:-.02em}
+h2{font-size:clamp(1.6rem,3.4vw,2.3rem);margin:0 0 .4em}
+h3{font-size:1.2rem;margin:1.6em 0 .5em}
+p{margin:.6em 0}
+a{color:var(--brand)}
+code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:.88em;background:var(--surface-2);padding:.12em .38em;border-radius:6px}
+pre{background:var(--code);color:var(--code-text);padding:16px 18px;border-radius:12px;overflow-x:auto;font-size:.84rem;line-height:1.55;margin:.9em 0}
+pre code{background:none;padding:0;font-size:inherit;color:inherit}
+pre .c{color:#8f86ab}pre .k{color:#c9a6f2}pre .s{color:#9fe0bd}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 22px}
+
+/* nav */
+nav.top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav.top .wrap{display:flex;align-items:center;gap:18px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;font-family:"Bricolage";font-weight:700;font-size:1.1rem;text-decoration:none;color:var(--text)}
+.brand img{width:30px;height:30px;border-radius:8px}
+nav.top ul{display:flex;gap:4px;list-style:none;margin:0 0 0 auto;padding:0;overflow-x:auto;scrollbar-width:none}
+nav.top ul::-webkit-scrollbar{display:none}
+nav.top a.l{display:block;padding:6px 11px;border-radius:8px;color:var(--muted);text-decoration:none;font-size:.9rem;white-space:nowrap}
+nav.top a.l:hover,nav.top a.l.on{background:var(--brand-soft);color:var(--brand)}
+@media (max-width:760px){nav.top ul{display:none}}
+
+/* hero */
+header.hero{padding:76px 0 56px;background:radial-gradient(1000px 420px at 85% -10%,color-mix(in srgb,var(--brand) 22%,transparent),transparent 70%)}
+.eyebrow{display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);background:var(--brand-soft);padding:5px 11px;border-radius:99px}
+header.hero h1{font-size:clamp(2.2rem,6vw,4rem);margin:.35em 0 .3em;max-width:14ch}
+header.hero h1 span{color:var(--brand)}
+.lead{font-size:1.15rem;color:var(--muted);max-width:62ch}
+.meta{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:28px;font-size:.92rem;color:var(--muted)}
+.meta b{color:var(--text);font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:38px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px}
+.stat strong{display:block;font-family:"Bricolage";font-size:1.7rem;color:var(--brand)}
+.stat span{font-size:.86rem;color:var(--muted)}
+
+section{padding:64px 0;border-top:1px solid var(--line)}
+.sec-n{font-family:"Bricolage";font-weight:700;color:var(--brand);font-size:.9rem;letter-spacing:.08em}
+.intro{color:var(--muted);max-width:70ch;font-size:1.05rem}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px}
+.card h3{margin-top:0}
+.card ul{padding-left:1.1em;margin:.4em 0}
+.card li{margin:.25em 0}
+.tag{display:inline-block;font-size:.74rem;font-weight:700;padding:3px 9px;border-radius:99px;margin-right:6px;vertical-align:middle}
+.t-done{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)}
+.t-next{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+
+/* arquitetura */
+.arch{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:stretch;gap:10px;margin:26px 0}
+.arch .box{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:.92rem}
+.arch .box b{display:block;font-family:"Bricolage";font-size:1.02rem;margin-bottom:4px;color:var(--brand)}
+.arch .arrow{align-self:center;color:var(--muted);font-size:1.4rem}
+@media (max-width:820px){.arch{grid-template-columns:1fr}.arch .arrow{transform:rotate(90deg);justify-self:center}}
+
+/* estruturas */
+.ds{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:26px 26px 18px;margin:22px 0}
+.ds-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;margin-bottom:6px}
+.ds-head h3{margin:0;font-size:1.45rem}
+.cx{font-family:ui-monospace,Menlo,monospace;font-size:.8rem;background:var(--brand-soft);color:var(--brand);padding:3px 9px;border-radius:7px}
+.where{font-size:.85rem;color:var(--muted)}
+.why{border-left:3px solid var(--brand);padding:4px 0 4px 14px;margin:14px 0;color:var(--text)}
+.why b{color:var(--brand)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+
+/* tabela */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.92rem;min-width:720px}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--surface-2);font-weight:700;font-size:.82rem;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+tr:last-child td{border-bottom:0}
+
+/* diagrama fila */
+.queue{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:14px 0;font-size:.85rem}
+.queue .q{background:var(--brand-soft);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-family:ui-monospace,Menlo,monospace}
+.queue .q.h{background:var(--brand);color:#fff;border-color:var(--brand)}
+.queue .lbl{color:var(--muted);font-size:.8rem}
+
+footer{padding:40px 0 60px;border-top:1px solid var(--line);color:var(--muted);font-size:.88rem}
+.team{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.team span{background:var(--surface);border:1px solid var(--line);padding:8px 14px;border-radius:99px;color:var(--text);font-weight:600}
+</style>
+</head>
+<body>
+
+<nav class="top"><div class="wrap">
+  <a class="brand" href="#topo"><img src="assets/logo.png" alt="">VINDIX</a>
+  <ul>
+    <li><a class="l" href="#visao">Visão geral</a></li>
+    <li><a class="l" href="#estado">Estado atual</a></li>
+    <li><a class="l" href="#estruturas">Estruturas de dados</a></li>
+    <li><a class="l" href="#tradeoffs">Trade-offs</a></li>
+    <li><a class="l" href="#memoria">Memória</a></li>
+    <li><a class="l" href="#conclusao">Conclusão</a></li>
+  </ul>
+</div></nav>
+
+<header class="hero" id="topo"><div class="wrap">
+  <span class="eyebrow">Projeto Integrador · Estruturas de Dados · ADC2</span>
+  <h1>Estruturas de dados que sustentam o <span>VINDIX</span></h1>
+  <p class="lead">Documento técnico do Projeto Integrador: um sistema web de gestão para clínicas multidisciplinares e as decisões de organização de dados, memória e eficiência de acesso por trás dele.</p>
+  <div class="meta">
+    <div><b>Curso:</b> Engenharia de Computação · UNISAL</div>
+    <div><b>Produto:</b> <a href="https://vindix.tech" target="_blank" rel="noopener">vindix.tech</a></div>
+    <div><b>Código:</b> <a href="https://github.com/pifaculdade2025/vindix" target="_blank" rel="noopener">github.com/pifaculdade2025/vindix</a></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><strong>~10,5 mil</strong><span>linhas de JavaScript</span></div>
+    <div class="stat"><strong>1 + N</strong><span>bancos Firebird (principal + um por clínica)</span></div>
+    <div class="stat"><strong>8</strong><span>módulos funcionais em produção</span></div>
+    <div class="stat"><strong>O(1)</strong><span>no caminho crítico de autenticação</span></div>
+  </div>
+</div></header>
+
+<main>
+
+<!-- 1 -->
+<section id="visao"><div class="wrap">
+  <div class="sec-n">01</div>
+  <h2>Visão geral do projeto</h2>
+  <p class="intro">Clínicas multidisciplinares (psicologia, fonoaudiologia, terapia ocupacional, fisioterapia etc.) costumam controlar agenda em um lugar, evolução dos pacientes em outro e financeiro numa planilha. O VINDIX reúne tudo isso num só sistema web, com isolamento real entre clínicas e controle de acesso por pessoa.</p>
+
+  <div class="grid g3" style="margin-top:26px">
+    <div class="card"><h3>O problema</h3><p>Informação espalhada, sem histórico confiável de alterações, cobrança de pacotes e convênios feita à mão e dados sensíveis de saúde sem proteção adequada.</p></div>
+    <div class="card"><h3>A solução</h3><p>Uma SPA com backend Node.js que centraliza agenda, sessões, plano terapêutico, financeiro, convênios e relatórios, sincronizando a agenda com o Google Calendar.</p></div>
+    <div class="card"><h3>Para quem</h3><p>Equipes mistas: profissionais (que veem só os próprios pacientes), recepção/administrativo e administradores com acesso total.</p></div>
+  </div>
+
+  <h3>Arquitetura</h3>
+  <div class="arch">
+    <div class="box"><b>Frontend (SPA)</b>JavaScript puro, navegação por hash, menus gerados a partir das permissões do usuário.</div>
+    <div class="arrow">→</div>
+    <div class="box"><b>API Node.js / Express 5</b>JWT, middlewares de permissão, rate limit, Helmet, criptografia AES-256-GCM de campos, filas por clínica.</div>
+    <div class="arrow">→</div>
+    <div class="box"><b>Firebird (multi-tenant)</b>Banco principal (usuários, empresas, tokens) + um arquivo <code>.FDB</code> por clínica, com migrações versionadas.</div>
+  </div>
+  <p>A escolha de <strong>um banco por clínica</strong> é, em si, uma decisão de organização de dados: o isolamento é físico, não depende de um <code>WHERE empresa = ?</code> esquecido. O custo é ter de gerenciar muitas conexões, problema resolvido com uma estrutura de dados específica (seção 3.3).</p>
+</div></section>
+
+<!-- 2 -->
+<section id="estado"><div class="wrap">
+  <div class="sec-n">02</div>
+  <h2>Estado atual de desenvolvimento</h2>
+  <p class="intro">O sistema está publicado em <a href="https://vindix.tech" target="_blank" rel="noopener">vindix.tech</a>. A versão atual em Node.js substituiu um protótipo inicial em Delphi 12 (TIdHTTPServer + FireDAC).</p>
+
+  <div class="grid g2" style="margin-top:24px">
+    <div class="card">
+      <h3><span class="tag t-done">Implementado</span></h3>
+      <ul>
+        <li><b>Agenda e lista de espera:</b> agendamentos recorrentes, controle de faltas, fila de espera por ordem de chegada e sincronização com o Google Calendar (sem nome do paciente).</li>
+        <li><b>Sessões e evolução:</b> resumo, nota de progresso (1 a 5), metas terapêuticas e gráficos.</li>
+        <li><b>Financeiro:</b> saldo por paciente, pagamentos, pacotes descontados do mais antigo, repasse por profissional.</li>
+        <li><b>Convênios:</b> guias, coparticipação, glosas e alertas de guias vencendo/acabando.</li>
+        <li><b>Relatórios:</b> sessões por semana, demanda por especialidade, horários de pico, carga por profissional.</li>
+        <li><b>Segurança:</b> JWT com versão de token, permissões por pessoa, bcrypt, AES-256-GCM em CPF/diagnóstico/evolução, rate limit, auditoria de alterações e exclusões, termos de uso e privacidade.</li>
+        <li><b>Operação:</b> migrações versionadas dos bancos, scripts de backup, modo claro/escuro.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="tag t-next">Próximos passos estruturais</span></h3>
+      <ul>
+        <li><b>“Desfazer” alteração</b> a partir do histórico de auditoria, tratando o histórico de cada registro como uma <b>pilha</b> (seção 3.2).</li>
+        <li><b>Fila persistente</b> para envio de e-mails e sincronização com o Google, para que nada se perca se o servidor reiniciar.</li>
+        <li><b>Cache e filas compartilhados (Redis)</b> caso o servidor passe a rodar em mais de um processo: hoje os <code>Map</code> em memória pressupõem processo único.</li>
+        <li><b>Heap para alertas</b> caso o volume de convênios cresça a ponto de só os <i>k</i> mais graves interessarem.</li>
+        <li>Paginação por cursor (<i>keyset</i>) nas listas maiores, no lugar de <code>FIRST/SKIP</code>.</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<!-- 3 -->
+<section id="estruturas"><div class="wrap">
+  <div class="sec-n">03 · FOCO PRINCIPAL</div>
+  <h2>Integração com a disciplina</h2>
+  <p class="intro">Cada estrutura abaixo aparece em um ponto real do código do VINDIX. Para cada uma: onde está, qual problema resolve e por que ela, e não outra.</p>
+
+  <!-- 3.1 Filas -->
+  <div class="ds" id="filas">
+    <div class="ds-head"><h3>3.1 Filas (FIFO)</h3><span class="cx">enfileirar O(1) · desenfileirar O(1)</span></div>
+    <div class="where">clinica.js · front/js/app.js · consultas SQL</div>
+
+    <h3>a) Fila de processamento do financeiro, uma por clínica</h3>
+    <p>Duas sessões registradas ao mesmo tempo poderiam consumir a última vaga do mesmo pacote, ou dois pagamentos simultâneos passariam juntos pela conferência do saldo. A solução foi serializar as operações que mexem em saldo numa <b>fila FIFO por empresa</b>: cada operação é encadeada no fim da anterior.</p>
+<pre><code><span class="c">// Uma fila por empresa: o lançamento de uma clínica não espera pelo de outra</span>
+<span class="k">const</span> filasFinanceiro = <span class="k">new</span> Map();            <span class="c">// empresa → último elemento da fila</span>
+<span class="k">export async function</span> exclusivoFinanceiro(usuario, fn) {
+    <span class="k">const</span> [{ empresa }] = <span class="k">await</span> getEmpresa(usuario);
+    <span class="k">const</span> anterior = filasFinanceiro.get(empresa) ?? Promise.resolve();
+    <span class="k">const</span> vez = anterior.then(fn, fn);          <span class="c">// entra no fim da fila</span>
+    <span class="k">const</span> fim = vez.catch(() => {});
+    filasFinanceiro.set(empresa, fim);         <span class="c">// novo "tail"</span>
+    fim.then(() => { <span class="k">if</span> (filasFinanceiro.get(empresa) === fim) filasFinanceiro.delete(empresa); });
+    <span class="k">return</span> vez;
+}</code></pre>
+    <div class="queue"><span class="lbl">Clínica A:</span><span class="q h">sessão #81</span>→<span class="q">pagamento</span>→<span class="q">sessão #82</span><span class="lbl">(tail)</span></div>
+    <div class="queue"><span class="lbl">Clínica B:</span><span class="q h">pagamento</span><span class="lbl">← independente da A</span></div>
+    <p>Na prática é uma <b>lista encadeada de promessas</b>: o <code>Map</code> guarda só o ponteiro para o último nó (o <i>tail</i>), e cada nó aponta para o anterior via <code>.then</code>. Inserir no fim custa O(1) e não há vetor crescendo. Quando a fila esvazia, a entrada da empresa é removida do <code>Map</code>, então a memória usada é proporcional só às clínicas com operações em andamento.</p>
+    <div class="why"><b>Por que fila e não um lock global?</b> Um lock único faria a clínica B esperar a clínica A. Com uma fila por chave, a exclusão mútua vale só onde há conflito real (o mesmo saldo). <b>Por que fila e não pilha?</b> Operações financeiras precisam ser aplicadas na ordem em que chegaram.</div>
+
+    <h3>b) Lista de espera de pacientes e consumo de pacotes</h3>
+    <p>A lista de espera é uma fila de domínio: <code>ORDER BY L.DT_ENTRADA, L.ID</code>, quem chegou primeiro é atendido primeiro, com o <code>ID</code> como desempate. O mesmo princípio vale para pacotes de sessões: a sessão é descontada do <b>pacote mais antigo com saldo</b> (<code>ORDER BY P.DT_COMPRA, P.ID</code>), o que evita que pacotes antigos fiquem esquecidos.</p>
+
+    <h3>c) Buffer de notificações (toasts) com tamanho fixo</h3>
+    <p>No frontend, as notificações formam um buffer FIFO limitado a <code>CONFIG.MAX_TOASTS</code>: quando chega uma nova e o limite foi atingido, as mais antigas saem primeiro. É o mesmo comportamento de um buffer circular de sensores IoT: memória constante, descartando o dado mais velho.</p>
+
+    <h3>d) Proteção da fila de eventos do servidor</h3>
+    <p>O Node.js processa requisições numa fila de eventos (<i>event loop</i>). O middleware <code>toobusy-js</code> mede o atraso dessa fila e responde <code>503</code> quando ela está saturada, e o <code>express-rate-limit</code> limita requisições por IP. Em vez de deixar a fila crescer sem limite (e a memória junto), o servidor rejeita cedo.</p>
+  </div>
+
+  <!-- 3.2 Pilhas -->
+  <div class="ds" id="pilhas">
+    <div class="ds-head"><h3>3.2 Pilhas (LIFO)</h3><span class="cx">push O(1) · pop O(1)</span></div>
+    <div class="where">conexaoBD.js (HISTORICO) · navegação do frontend</div>
+    <p>Toda alteração e exclusão gera linhas na tabela <code>HISTORICO</code> (tabela, campo, valor antigo, valor novo, usuário, data/hora). O visualizador de histórico mostra os eventos do <b>mais recente para o mais antigo</b>: o histórico de um registro é lido como uma <b>pilha</b>, em que o topo é a última alteração.</p>
+    <p>Essa organização é o que permite o próximo passo planejado, a função <b>desfazer</b>: desempilhar a alteração do topo e regravar o <code>VALOR_ANTIGO</code>. Só faz sentido desfazer na ordem inversa: desfazer uma alteração antiga sem desfazer as mais novas deixaria o registro inconsistente.</p>
+    <div class="queue"><span class="lbl">topo →</span><span class="q h">14:32 telefone</span><span class="q">14:10 endereço</span><span class="q">09:05 criação</span><span class="lbl">← base</span></div>
+    <p>A navegação da SPA também se apoia na pilha de histórico do navegador. O VINDIX usa <code>history.replaceState</code> (substitui o topo) em vez de <code>pushState</code> (empilha), de propósito: trocar de tela pelo menu não deve encher a pilha do botão “voltar” com dezenas de entradas.</p>
+    <div class="why"><b>Pilha também aparece sem ser declarada:</b> a função <code>obterConexao</code> tenta novamente de forma recursiva (até 5 vezes) quando o login no Firebird falha; cada tentativa ocupa um quadro na pilha de chamadas. O limite de tentativas é o que garante que essa pilha não cresça sem fim.</div>
+  </div>
+
+  <!-- 3.3 Listas encadeadas / LRU -->
+  <div class="ds" id="listas">
+    <div class="ds-head"><h3>3.3 Listas encadeadas: o cache LRU de conexões</h3><span class="cx">acesso O(1) · remoção do menos usado O(1)</span></div>
+    <div class="where">conexaoBD.js · biblioteca lru-cache</div>
+    <p>Como cada clínica tem seu próprio arquivo de banco, cada uma precisa do seu <b>pool de conexões</b> (5 conexões). Manter um pool aberto para toda clínica cadastrada esgotaria memória e conexões do Firebird. Criar e destruir a cada requisição seria lento. A solução foi um <b>cache LRU</b> (<i>Least Recently Used</i>):</p>
+<pre><code><span class="k">const</span> poolsEmpresa = <span class="k">new</span> LRUCache({
+  max: <span class="s">50</span>,                            <span class="c">// no máximo 50 clínicas com pool aberto</span>
+  dispose: (pool, key) => { pool.destroy(); },  <span class="c">// ao sair do cache, libera as conexões</span>
+  ttl: <span class="s">1000 * 60 * 30</span>                  <span class="c">// pool sem uso por 30 min expira</span>
+});</code></pre>
+    <div class="cols">
+      <div>
+        <p>Internamente, um LRU combina duas estruturas:</p>
+        <ul>
+          <li><b>Tabela hash</b> (caminho do banco → nó): encontra o pool em O(1).</li>
+          <li><b>Lista duplamente encadeada</b> ordenada por uso: a cada acesso o nó vai para a frente; quando o limite é atingido, remove-se o nó do fim (o menos usado) em O(1).</li>
+        </ul>
+      </div>
+      <div>
+        <p>Por que lista encadeada e não vetor? Mover um elemento do meio de um vetor para o início custa O(n) (deslocar todos). Na lista duplamente encadeada basta religar 4 ponteiros. O número de clínicas ativas muda o tempo todo, e a lista cresce e encolhe sem realocação.</p>
+      </div>
+    </div>
+    <div class="why"><b>Ligação direta com alocação de memória:</b> o <code>dispose</code> é o equivalente ao <code>free()</code> da aula. Sair da estrutura não basta; o recurso (as conexões TCP com o banco) precisa ser liberado explicitamente, senão haveria vazamento.</div>
+  </div>
+
+  <!-- 3.4 Hash -->
+  <div class="ds" id="hash">
+    <div class="ds-head"><h3>3.4 Tabelas hash (Map e Set)</h3><span class="cx">busca, inserção e remoção O(1) médio</span></div>
+    <div class="where">auth.js · nonces.js · agenda.js · regras.js · funcoes.js</div>
+    <p>É a estrutura mais usada no backend, sempre no caminho que roda a cada requisição:</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Onde</th><th>Estrutura</th><th>O que resolve</th></tr></thead>
+      <tbody>
+        <tr><td><code>auth.js</code> · cacheTokenVersion</td><td><code>Map</code> id → versão (TTL 30 s)</td><td>Cada requisição valida se o JWT ainda é válido (senha trocada ou logout invalidam a versão). O cache evita uma consulta ao banco por requisição.</td></tr>
+        <tr><td><code>auth.js</code> · ROTAS_DURANTE_TROCA</td><td><code>Set</code></td><td>Usuário com senha temporária só acessa certas rotas. Verificar “rota ∈ conjunto” é O(1), contra O(n) de percorrer um vetor.</td></tr>
+        <tr><td><code>nonces.js</code></td><td><code>Map</code> nonce → {usuário, expira}</td><td>Tokens de uso único no fluxo OAuth do Google: consulta e remoção em O(1) (<code>get</code> + <code>delete</code>), impedindo reuso do mesmo link.</td></tr>
+        <tr><td><code>agenda.js</code> · tokenPorUsuario</td><td><code>Map</code> usuário → promessa do token</td><td>Sincronizar uma série inteira de agendamentos usa um só token do Google: as demais chamadas aguardam a mesma promessa.</td></tr>
+        <tr><td><code>regras.js</code> · CAMPOS_CRIPTOGRAFADOS</td><td><code>Set</code> por tabela</td><td>Decide em O(1) se um campo (CPF, diagnóstico, evolução) deve ser criptografado antes de gravar.</td></tr>
+        <tr><td><code>funcoes.js</code> / <code>convenios.js</code></td><td><code>new Set(ids)</code>, <code>new Map(lista)</code></td><td>Remover IDs duplicados e “juntar” listas em memória (ex.: id → nome do convênio) em O(n), em vez de O(n²) com laços aninhados.</td></tr>
+      </tbody>
+    </table></div>
+<pre><code><span class="k">export function</span> consumirNonce(nonce) {
+    <span class="k">const</span> entry = nonces.get(nonce);      <span class="c">// O(1)</span>
+    <span class="k">if</span> (!entry) <span class="k">return null</span>;
+    nonces.delete(nonce);                  <span class="c">// uso único</span>
+    <span class="k">if</span> (Date.now() > entry.expira) <span class="k">return null</span>;
+    <span class="k">return</span> entry.usuario;
+}</code></pre>
+    <div class="why"><b>Hash de tabela ≠ hash criptográfico.</b> O projeto usa os dois e eles têm objetivos opostos. A tabela hash quer ser <b>rápida</b> (O(1)). Para senhas usamos <b>bcrypt</b>, que é <b>lento de propósito</b> (custo configurável por <code>SALT_ROUNDS</code>) para dificultar força bruta. Códigos de recuperação de senha são guardados como SHA-256, nunca em texto puro. O login também compara contra um hash falso quando o usuário não existe, para que o tempo de resposta não revele quais logins são válidos.</div>
+  </div>
+
+  <!-- 3.5 Ordenação e busca -->
+  <div class="ds" id="ordenacao">
+    <div class="ds-head"><h3>3.5 Ordenação e busca</h3><span class="cx">ordenação O(n log n) · busca indexada O(log n)</span></div>
+    <div class="where">convenios.js · relatórios · índices do Firebird · front/js/app.js</div>
+
+    <h3>Ordenação multicritério para ranking de alertas</h3>
+    <p>O painel de convênios gera alertas (guia ausente, sessões agendadas acima do saldo, guia acabando ou vencendo) e precisa mostrar os mais graves primeiro:</p>
+<pre><code>alertas.sort((a, b) =>
+    b.gravidade - a.gravidade                                   <span class="c">// 1º: gravidade (decrescente)</span>
+ || String(a.paciente).localeCompare(String(b.paciente), <span class="s">'pt-BR'</span>)); <span class="c">// 2º: nome (A–Z, com acentos)</span></code></pre>
+    <p>O <code>Array.prototype.sort</code> do V8 usa <b>TimSort</b> (híbrido de merge sort e insertion sort): O(n log n) no pior caso e <b>estável</b>. A estabilidade importa quando se ordena por um critério depois do outro. O <code>localeCompare('pt-BR')</code> garante que “Álvaro” fique junto de “Alice”, e não depois de “Zélia” como aconteceria comparando códigos Unicode.</p>
+    <p>Os rankings dos relatórios (demanda por especialidade, horários de pico, carga por profissional, formas de pagamento) seguem o mesmo padrão: agregação no banco (<code>GROUP BY</code>) e ordenação do resultado já reduzido.</p>
+
+    <h3>Busca: índices B-tree do banco</h3>
+    <p>As buscas por chave (paciente por ID, consultas por data, guias por validade) são resolvidas pelos <b>índices do Firebird, que são árvores B</b>. A árvore B é a generalização da busca binária para disco: cada nó tem muitas chaves, a árvore fica rasa e cada consulta lê poucas páginas (<code>pageSize: 4096</code>). Localizar um registro entre milhões custa O(log n).</p>
+    <p>No frontend, a busca por nome usa <b>debounce</b> de 300 ms: a consulta só é enviada quando o usuário para de digitar, reduzindo de uma requisição por tecla para uma por palavra.</p>
+    <div class="why"><b>Onde a busca binária aparece de verdade:</b> qualquer lista já ordenada (como o log de histórico, gravado em ordem de data/hora) permite localizar um instante em O(log n) dividindo o intervalo ao meio. É o que o índice faz por nós; reescrever isso em JavaScript sobre dados que já estão indexados no banco seria duplicar trabalho.</div>
+  </div>
+
+  <!-- 3.6 Heap -->
+  <div class="ds" id="heap">
+    <div class="ds-head"><h3>3.6 Filas de prioridade</h3><span class="cx">heap: inserir O(log n) · extrair máx. O(log n)</span></div>
+    <div class="where">clinica.js (guias) · convenios.js (alertas)</div>
+    <p>Dois pontos do sistema são, conceitualmente, filas de prioridade:</p>
+    <ul>
+      <li><b>Escolha da guia de convênio:</b> a sessão usa a guia com vaga que <b>vence antes</b> (<code>ORDER BY COALESCE(G.VALIDADE, '9999-12-31'), G.DT_EMISSAO</code> + <code>FIRST 1</code>). É uma extração do mínimo: a prioridade é a data de validade, para que nenhuma guia expire com sessões sobrando.</li>
+      <li><b>Alertas críticos:</b> a gravidade (1 a 3) é a prioridade.</li>
+    </ul>
+    <div class="why"><b>Decisão de trade-off: por que ainda não usamos um heap.</b> Para a guia, o índice do banco já entrega o mínimo sem carregar todas as guias. Para os alertas, a lista de uma clínica tem dezenas de itens e é exibida <i>inteira</i>: ordenar tudo custa O(n log n), o mesmo que montar um heap e extrair n elementos. O heap só ganha quando interessam os <i>k</i> primeiros de um n grande (O(n + k log n)), ou quando itens chegam continuamente, como num sistema de alarmes em tempo real. Esse é o gatilho registrado nos próximos passos.</div>
+  </div>
+
+  <!-- 3.7 Árvores e grafos -->
+  <div class="ds" id="arvores">
+    <div class="ds-head"><h3>3.7 Árvores e grafos</h3><span class="cx">hierarquias e relacionamentos</span></div>
+    <div class="where">Observacoes.txt (permissões) · vínculos · DOM</div>
+    <div class="cols">
+      <div>
+        <h3>Árvore de permissões</h3>
+        <p>As permissões são codificadas em dois dígitos: o primeiro é a tabela, o segundo a ação. Isso forma uma hierarquia de três níveis:</p>
+<pre><code>1  Acesso geral (raiz: dispensa todas)
+├─ 10 Cadastros · geral
+│   ├─ 11 acessar  12 inserir  13 alterar
+│   └─ 14 excluir  15 histórico
+├─ 20 Consultas · geral → 21…25
+├─ 40 Agendamentos · geral → 41…45
+└─ 60 Financeiro · geral → 61…63</code></pre>
+        <p>Verificar uma permissão é subir a árvore: tem a folha (ex.: 12)? Senão, tem o nó da tabela (10)? Senão, tem a raiz (1)? São no máximo três testes de pertinência no vetor de permissões do usuário (<code>permissoes.includes</code>). Aqui um vetor é adequado: cada usuário tem poucas dezenas de permissões, então O(n) com n pequeno é tão rápido quanto um <code>Set</code> e mais simples de serializar.</p>
+      </div>
+      <div>
+        <h3>Grafo de vínculos</h3>
+        <p>Os vínculos “profissional atende paciente na especialidade X” formam um <b>grafo bipartido</b> entre profissionais e pacientes, com arestas rotuladas pela especialidade. É esse grafo que define o que cada profissional enxerga: um usuário ligado a um profissional só vê os pacientes adjacentes a ele.</p>
+        <p>O frontend monta essas adjacências como listas em <code>Map</code> (paciente → especialidades permitidas) para filtrar os <i>selects</i> em cascata do agendamento sem novas idas ao servidor.</p>
+        <h3>Hierarquia multi-tenant</h3>
+        <p>Banco principal → empresas → registros de cada clínica: outra árvore, que dá o isolamento entre clientes.</p>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 4 -->
+<section id="tradeoffs"><div class="wrap">
+  <div class="sec-n">04</div>
+  <h2>Leitura rápida ou inserção rápida?</h2>
+  <p class="intro">O critério da disciplina aplicado a cada cenário: qual operação domina e qual estrutura atende a ela.</p>
+  <div class="tbl" style="margin-top:22px"><table>
+    <thead><tr><th>Cenário</th><th>Operação dominante</th><th>Escolha</th><th>Alternativa descartada e motivo</th></tr></thead>
+    <tbody>
+      <tr><td>Validar token a cada requisição</td><td>Leitura por chave, milhares de vezes</td><td>Tabela hash com TTL</td><td>Consulta ao banco toda vez: latência e carga desnecessárias.</td></tr>
+      <tr><td>Lançamentos financeiros simultâneos</td><td>Inserção no fim + processamento em ordem</td><td>Fila FIFO por clínica</td><td>Lock global: clínicas sem conflito esperariam umas pelas outras.</td></tr>
+      <tr><td>Pools de conexão por clínica</td><td>Leitura por chave + remoção do menos usado</td><td>LRU (hash + lista duplamente encadeada)</td><td>Vetor: reordenar por uso custa O(n). Sem limite: esgota memória e conexões.</td></tr>
+      <tr><td>Histórico de auditoria</td><td>Inserção constante, leitura do mais novo</td><td>Log append-only lido como pilha</td><td>Sobrescrever o registro: perde-se a rastreabilidade exigida para dados de saúde.</td></tr>
+      <tr><td>Ranking de alertas</td><td>Ordenar lista pequena e exibir inteira</td><td>Ordenação estável O(n log n)</td><td>Heap: sem ganho quando todos os itens são exibidos.</td></tr>
+      <tr><td>Busca de registros no banco</td><td>Leitura por chave/intervalo</td><td>Índice B-tree</td><td>Varredura completa O(n). O custo do índice (escrita um pouco mais lenta) compensa porque lemos muito mais do que gravamos.</td></tr>
+      <tr><td>Rotas liberadas / campos criptografados</td><td>Teste de pertinência</td><td><code>Set</code></td><td><code>Array.includes</code>: O(n) a cada verificação.</td></tr>
+    </tbody>
+  </table></div>
+</div></section>
+
+<!-- 5 -->
+<section id="memoria"><div class="wrap">
+  <div class="sec-n">05</div>
+  <h2>Gerenciamento de memória</h2>
+  <p class="intro">Um servidor Node.js roda por semanas sem reiniciar. Qualquer estrutura em memória que só cresce vira um vazamento. Todas as estruturas do VINDIX têm um limite ou uma rotina de limpeza:</p>
+  <div class="grid g3" style="margin-top:22px">
+    <div class="card"><h3>Limite de tamanho</h3><p>LRU com no máximo 50 pools; <code>tokenPorUsuario</code> é esvaziado acima de 5.000 entradas; corpo de requisição limitado a 100 KB; buffer de notificações com tamanho fixo.</p></div>
+    <div class="card"><h3>Expiração (TTL)</h3><p>Nonces expiram em 10 min e uma varredura a cada 5 min remove os vencidos; cache de versão de token dura 30 s; pools ociosos expiram em 30 min.</p></div>
+    <div class="card"><h3>Liberação explícita</h3><p><code>dispose → pool.destroy()</code> fecha conexões ao sair do cache; a fila financeira apaga a chave da empresa quando esvazia; timers de limpeza usam <code>.unref()</code> para não prender o processo.</p></div>
+  </div>
+  <p style="margin-top:20px">É a mesma disciplina do <code>malloc</code>/<code>free</code> vista em C, aplicada num ambiente com coletor de lixo: o coletor só libera o que nenhuma estrutura referencia mais. Se um <code>Map</code> global mantém a referência, o objeto nunca é coletado. Por isso a remoção precisa ser feita no código.</p>
+</div></section>
+
+<!-- 6 -->
+<section id="conclusao"><div class="wrap">
+  <div class="sec-n">06</div>
+  <h2>Como a disciplina ajudou no PI</h2>
+  <div class="grid g2" style="margin-top:18px">
+    <div class="card">
+      <h3>Antes</h3>
+      <p>As primeiras versões usavam vetores para quase tudo e consultavam o banco sempre que precisavam de algo. Funcionava com poucos dados, mas não havia critério para saber <i>por que</i> algo ficaria lento ou consumiria memória.</p>
+    </div>
+    <div class="card">
+      <h3>Depois</h3>
+      <p>A análise assintótica deu um vocabulário para decidir: identificar a operação dominante, escolher a estrutura que a torna O(1) ou O(log n) e aceitar conscientemente o custo nas demais. Os conceitos de ponteiros e alocação explicaram o funcionamento do LRU e da fila encadeada de promessas, e deixaram claro que toda estrutura em memória precisa de uma política de liberação.</p>
+    </div>
+  </div>
+  <p style="margin-top:20px">O resultado é um sistema em que as decisões de arquitetura podem ser justificadas: <b>hash</b> onde a leitura domina, <b>fila</b> onde a ordem importa, <b>lista encadeada</b> onde o conjunto muda o tempo todo, <b>árvores</b> onde há hierarquia ou busca em disco, e <b>ordenação simples</b> onde um heap não traria ganho.</p>
+</div></section>
+
+</main>
+
+<footer><div class="wrap">
+  <b style="color:var(--text)">Equipe</b>
+  <div class="team"><span>Diego Matheus Zanela</span></div>
+  <p>Projeto Integrador · Estruturas de Dados · Engenharia de Computação · UNISAL · 2026</p>
+  <p>Fontes Bricolage Grotesque e Figtree sob SIL Open Font License (<a href="assets/OFL-bricolage-grotesque.txt">licença</a>, <a href="assets/OFL-figtree.txt">licença</a>).</p>
+</div></footer>
+
+<script>
+const links=[...document.querySelectorAll('nav.top a.l')];
+const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){links.forEach(l=>l.classList.toggle('on',l.getAttribute('href')==='#'+e.target.id));}}),{rootMargin:'-45% 0px -50% 0px'});
+secs.forEach(s=>s&&io.observe(s));
+</script>
+</body>
+</html>
