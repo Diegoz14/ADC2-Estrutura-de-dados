@@ -102,6 +102,8 @@ tr:last-child td{border-bottom:0}
 .queue .q.h{background:var(--brand);color:#fff;border-color:var(--brand)}
 .queue .lbl{color:var(--muted);font-size:.8rem}
 
+.big{font-size:clamp(1.25rem,2.6vw,1.6rem);line-height:1.45;max-width:36ch;margin:.3em 0}
+.ana{font-size:1.15rem;font-style:italic;color:var(--brand);margin:.2em 0 .6em}
 footer{padding:40px 0 60px;border-top:1px solid var(--line);color:var(--muted);font-size:.88rem}
 .team{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
 .team span{background:var(--surface);border:1px solid var(--line);padding:8px 14px;border-radius:99px;color:var(--text);font-weight:600}
@@ -114,7 +116,6 @@ footer{padding:40px 0 60px;border-top:1px solid var(--line);color:var(--muted);f
   <ul>
     <li><a class="l" href="#visao">Projeto</a></li>
     <li><a class="l" href="#estruturas">Estruturas</a></li>
-    <li><a class="l" href="#memoria">Memória</a></li>
     <li><a class="l" href="#conclusao">Conclusão</a></li>
   </ul>
 </div></nav>
@@ -122,131 +123,75 @@ footer{padding:40px 0 60px;border-top:1px solid var(--line);color:var(--muted);f
 <header class="hero" id="topo"><div class="wrap">
   <span class="eyebrow">Projeto Integrador · Estruturas de Dados · ADC2</span>
   <h1>Estruturas de dados no <span>VINDIX</span></h1>
-  <p class="lead">Como usamos o que aprendemos na disciplina para deixar o sistema mais rápido, organizado e sem desperdício de memória.</p>
-  <div class="meta">
-    <div><b>Curso:</b> Engenharia de Computação · UNISAL</div>
-    <div><b>Sistema:</b> <a href="https://vindix.tech" target="_blank" rel="noopener">vindix.tech</a></div>
-    <div><b>Código:</b> <a href="https://github.com/pifaculdade2025/vindix" target="_blank" rel="noopener">github.com/pifaculdade2025/vindix</a></div>
-  </div>
+  <p class="lead">Como a matéria ajudou a deixar nosso sistema mais rápido e organizado.</p>
 </div></header>
 
 <main>
 
 <section id="visao"><div class="wrap">
   <div class="sec-n">01</div>
-  <h2>O projeto</h2>
-  <p class="intro">O VINDIX é um sistema para clínicas: agenda, sessões, financeiro e convênios. Cada clínica tem o <b>seu próprio banco de dados</b>, o que deixa os dados separados e seguros, mas exige cuidado com conexões e memória.</p>
+  <h2>O que é o VINDIX?</h2>
+  <p class="big">Um sistema para clínicas organizarem <b>agenda</b>, <b>pacientes</b> e <b>pagamentos</b> em um só lugar.</p>
   <div class="grid g2" style="margin-top:22px">
-    <div class="card">
-      <h3><span class="tag t-done">Hoje</span></h3>
-      <p>O sistema já está funcionando em <a href="https://vindix.tech" target="_blank" rel="noopener">vindix.tech</a>, e todas as estruturas abaixo já estão no código.</p>
-    </div>
-    <div class="card">
-      <h3><span class="tag t-next">Próximos passos</span></h3>
-      <ul>
-        <li>Botão <b>desfazer</b> usando uma pilha.</li>
-        <li><b>Fila</b> de e-mails que não se perde se o servidor reiniciar.</li>
-        <li><b>Heap</b> para os alertas, se o volume crescer.</li>
-      </ul>
-    </div>
+    <div class="card"><h3><span class="tag t-done">Hoje</span></h3><p>Já está funcionando em <a href="https://vindix.tech" target="_blank" rel="noopener">vindix.tech</a>.</p></div>
+    <div class="card"><h3><span class="tag t-next">Próximo passo</span></h3><p>Criar um botão de <b>desfazer</b> alterações.</p></div>
   </div>
 </div></section>
 
 <section id="estruturas"><div class="wrap">
-  <div class="sec-n">02 · FOCO PRINCIPAL</div>
-  <h2>Onde usamos cada estrutura</h2>
-  <p class="intro">Para cada estrutura: o que ela é, onde está no sistema e por que escolhemos ela.</p>
+  <div class="sec-n">02</div>
+  <h2>Onde usamos o que aprendemos</h2>
 
-  <div class="ds" id="filas">
-    <div class="ds-head"><h3>Fila</h3><span class="cx">primeiro a entrar, primeiro a sair</span></div>
-    <p><b>Onde:</b> no financeiro. Se duas sessões forem registradas ao mesmo tempo, as duas poderiam usar a última vaga do mesmo pacote. Para evitar isso, cada clínica tem uma fila: as operações são feitas <b>uma de cada vez, na ordem em que chegaram</b>.</p>
-    <div class="queue"><span class="lbl">Clínica A:</span><span class="q h">sessão</span>→<span class="q">pagamento</span>→<span class="q">sessão</span></div>
-    <div class="queue"><span class="lbl">Clínica B:</span><span class="q h">pagamento</span><span class="lbl">← não espera a clínica A</span></div>
-    <p><b>Também usamos em:</b> lista de espera de pacientes (quem chegou antes é chamado antes) e pacotes de sessões (o pacote mais antigo é usado primeiro).</p>
-    <div class="why"><b>Por que fila?</b> Dinheiro precisa ser lançado na ordem certa. E como é uma fila por clínica, uma clínica não fica esperando a outra.</div>
+  <div class="ds">
+    <div class="ds-head"><h3>Fila</h3><span class="cx">quem chega primeiro, sai primeiro</span></div>
+    <p class="ana">É como a fila do banco.</p>
+    <p><b>No VINDIX:</b> os pagamentos são feitos um de cada vez, na ordem em que chegam. Assim ninguém paga duas vezes pela mesma sessão.</p>
+    <div class="queue"><span class="q h">1º pagamento</span>→<span class="q">2º pagamento</span>→<span class="q">3º pagamento</span></div>
   </div>
 
-  <div class="ds" id="pilhas">
-    <div class="ds-head"><h3>Pilha</h3><span class="cx">último a entrar, primeiro a sair</span></div>
-    <p><b>Onde:</b> no histórico de alterações. Toda mudança num cadastro fica salva, e a tela mostra <b>da mais nova para a mais antiga</b>, igual a uma pilha de pratos: o de cima é o último colocado.</p>
-    <div class="queue"><span class="lbl">topo →</span><span class="q h">14:32 telefone</span><span class="q">14:10 endereço</span><span class="q">09:05 criação</span></div>
-    <div class="why"><b>Por que pilha?</b> É o que permite criar o botão <b>desfazer</b>: tiramos a alteração do topo e voltamos o valor antigo. Só faz sentido desfazer da mais nova para a mais antiga.</div>
+  <div class="ds">
+    <div class="ds-head"><h3>Pilha</h3><span class="cx">o último que entra sai primeiro</span></div>
+    <p class="ana">É como uma pilha de pratos: você pega o de cima.</p>
+    <p><b>No VINDIX:</b> o histórico mostra primeiro a alteração mais recente. É isso que vai permitir o botão “desfazer”.</p>
+    <div class="queue"><span class="lbl">topo →</span><span class="q h">mudou telefone</span><span class="q">mudou endereço</span><span class="q">cadastro criado</span></div>
   </div>
 
-  <div class="ds" id="listas">
-    <div class="ds-head"><h3>Lista encadeada</h3><span class="cx">itens ligados por ponteiros</span></div>
-    <p><b>Onde:</b> nas conexões com o banco. Cada clínica precisa das suas conexões, mas deixar todas abertas gastaria memória demais. Usamos um <b>cache LRU</b>: guarda no máximo 50 clínicas e, quando enche, fecha a que está há mais tempo sem uso.</p>
-<pre><code><span class="k">const</span> poolsEmpresa = <span class="k">new</span> LRUCache({
-  max: <span class="s">50</span>,                                  <span class="c">// no máximo 50 clínicas</span>
-  dispose: (pool) => pool.destroy(),         <span class="c">// ao sair, fecha as conexões</span>
-  ttl: <span class="s">30 * 60 * 1000</span>                       <span class="c">// sem uso por 30 min, sai</span>
-});</code></pre>
-    <div class="why"><b>Por que lista encadeada?</b> Por dentro, o LRU é uma lista ligada em ordem de uso. Mover um item para a frente só troca ponteiros, sem precisar empurrar todos os outros como num vetor.</div>
+  <div class="ds">
+    <div class="ds-head"><h3>Lista encadeada</h3><span class="cx">itens ligados um ao outro</span></div>
+    <p class="ana">É como um trem: os vagões são ligados e dá para tirar ou colocar um sem mexer nos outros.</p>
+    <p><b>No VINDIX:</b> guarda as conexões de até 50 clínicas. Quando enche, sai a que está há mais tempo parada.</p>
   </div>
 
-  <div class="ds" id="hash">
-    <div class="ds-head"><h3>Tabela hash (Map e Set)</h3><span class="cx">acha pela chave, sem percorrer tudo</span></div>
-    <p><b>Onde:</b> em tudo que é consultado a cada acesso ao sistema:</p>
-    <ul>
-      <li><b>Login:</b> guarda por alguns segundos se o token do usuário ainda é válido, sem ir ao banco toda hora.</li>
-      <li><b>Google Agenda:</b> códigos de uso único, que são apagados assim que usados.</li>
-      <li><b>Dados sensíveis:</b> um <code>Set</code> diz na hora se o campo (CPF, diagnóstico) precisa ser criptografado.</li>
-    </ul>
-    <div class="why"><b>Por que hash?</b> Num vetor, para achar algo é preciso olhar item por item. Na tabela hash vamos direto na chave, com o mesmo tempo para 10 ou 10 mil itens.</div>
+  <div class="ds">
+    <div class="ds-head"><h3>Tabela hash</h3><span class="cx">achar direto pela chave</span></div>
+    <p class="ana">É como um armário com etiquetas: você vai direto na gaveta certa, sem abrir todas.</p>
+    <p><b>No VINDIX:</b> no login, o sistema confere na hora se o usuário pode entrar, sem procurar no banco toda vez.</p>
   </div>
 
-  <div class="ds" id="ordenacao">
-    <div class="ds-head"><h3>Ordenação e busca</h3><span class="cx">organizar e encontrar rápido</span></div>
-    <p><b>Ordenação:</b> o painel de convênios mostra os alertas <b>mais graves primeiro</b> e, em caso de empate, por nome do paciente. Os relatórios (dias mais cheios, especialidades mais procuradas) também são rankings ordenados.</p>
-    <p><b>Busca:</b> o banco usa <b>índices em árvore</b>, que funcionam como uma busca binária: a cada passo, metade dos dados é descartada. Por isso achar um paciente entre milhares é rápido.</p>
-    <div class="why"><b>Detalhe:</b> na busca por nome, o sistema espera o usuário parar de digitar antes de pesquisar. Em vez de uma busca por letra, é feita uma por palavra.</div>
+  <div class="ds">
+    <div class="ds-head"><h3>Ordenação e busca</h3><span class="cx">organizar e encontrar</span></div>
+    <p class="ana">É como procurar uma palavra no dicionário: abre no meio e vai cortando pela metade.</p>
+    <p><b>No VINDIX:</b> os alertas mais graves aparecem primeiro, e a busca por paciente é rápida mesmo com milhares de cadastros.</p>
   </div>
 
-  <div class="ds" id="heap">
-    <div class="ds-head"><h3>Fila de prioridade</h3><span class="cx">o mais importante sai primeiro</span></div>
-    <p><b>Onde:</b> nas guias de convênio, o sistema sempre usa primeiro a guia que <b>vence antes</b>, para nenhuma vencer com sessões sobrando.</p>
-    <div class="why"><b>Por que não usamos heap (ainda)?</b> Cada clínica tem poucos alertas e todos aparecem na tela, então ordenar a lista inteira é tão rápido quanto. O heap vale a pena quando a lista é grande e só os primeiros interessam.</div>
-  </div>
-
-  <div class="ds" id="arvores">
-    <div class="ds-head"><h3>Árvores e grafos</h3><span class="cx">hierarquias e ligações</span></div>
-    <div class="cols">
-      <div>
-        <p><b>Árvore de permissões:</b> o código tem dois dígitos, a tela e a ação.</p>
-<pre><code>1   Acesso total
-├─ 10  Cadastros (tudo)
-│   ├─ 11 ver    12 incluir
-│   └─ 13 alterar  14 excluir
-└─ 60  Financeiro (tudo)
-    └─ 61 … 63</code></pre>
-        <p>Para saber se alguém pode incluir um cadastro, o sistema sobe a árvore: tem o 12? Senão, o 10? Senão, o 1?</p>
-      </div>
-      <div>
-        <p><b>Grafo de vínculos:</b> profissionais e pacientes são os pontos, e “atende na especialidade X” é a ligação entre eles.</p>
-        <p>Cada profissional só enxerga os pacientes ligados a ele no grafo.</p>
-      </div>
-    </div>
-  </div>
-</div></section>
-
-
-
-<section id="memoria"><div class="wrap">
-  <div class="sec-n">03</div>
-  <h2>Cuidando da memória</h2>
-  <p class="intro">O servidor fica ligado por semanas. Se uma estrutura só cresce, a memória acaba. Por isso cada uma tem uma regra:</p>
-  <div class="grid g3" style="margin-top:22px">
-    <div class="card"><h3>Tamanho máximo</h3><p>No máximo 50 clínicas com conexão aberta e só 3 avisos na tela por vez.</p></div>
-    <div class="card"><h3>Prazo de validade</h3><p>Códigos de uso único somem em 10 minutos, e o cache de login dura 30 segundos.</p></div>
-    <div class="card"><h3>Liberar ao sair</h3><p>Quando uma clínica sai do cache, as conexões dela são fechadas. É o <code>free()</code> que vimos em aula.</p></div>
+  <div class="ds">
+    <div class="ds-head"><h3>Árvore</h3><span class="cx">organização em níveis</span></div>
+    <p class="ana">É como uma árvore genealógica: de cima para baixo, por níveis.</p>
+    <p><b>No VINDIX:</b> as permissões. Quem tem acesso total pode tudo; abaixo disso, cada tela tem suas próprias permissões.</p>
+    <div class="queue"><span class="q h">Acesso total</span>→<span class="q">Cadastros</span>→<span class="q">ver · incluir · excluir</span></div>
   </div>
 </div></section>
 
 <section id="conclusao"><div class="wrap">
-  <div class="sec-n">04</div>
-  <h2>O que a disciplina mudou no projeto</h2>
-  <p class="intro">Antes, usávamos vetores para quase tudo e consultávamos o banco a todo momento. A disciplina nos ensinou a perguntar: <b>o que mais acontece aqui, ler ou inserir?</b> E a escolher a estrutura certa para isso.</p>
-  <p>Também aprendemos que toda estrutura na memória precisa de um limite ou de uma forma de ser liberada, igual ao <code>malloc</code> e <code>free</code> vistos em sala.</p>
+  <div class="sec-n">03</div>
+  <h2>O que aprendemos</h2>
+  <p class="big">Antes de escolher uma estrutura, a pergunta é: <b>aqui eu mais leio ou mais guardo dados?</b></p>
+  <div class="grid g3" style="margin-top:22px">
+    <div class="card"><h3>Leio muito</h3><p>Tabela hash ou árvore: acham rápido.</p></div>
+    <div class="card"><h3>A ordem importa</h3><p>Fila ou pilha.</p></div>
+    <div class="card"><h3>Muda o tempo todo</h3><p>Lista encadeada.</p></div>
+  </div>
+  <p style="margin-top:20px">E toda estrutura na memória precisa de um <b>limite</b>, senão a memória do servidor acaba.</p>
 </div></section>
 
 </main>
